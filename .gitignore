@@ -1,0 +1,16 @@
+# Node.js
+node_modules/
+.env
+package-lock.json
+
+# Logs
+logs
+*.log
+npm-debug.log*
+
+# Tests
+coverage/
+.cucumber/
+
+# Visual Studio Code
+.vscode/
