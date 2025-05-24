@@ -14,3 +14,6 @@ coverage/
 
 # Visual Studio Code
 .vscode/
+
+# JetBrains IDEs (como WebStorm, PhpStorm, IntelliJ, etc.)
+.idea/
