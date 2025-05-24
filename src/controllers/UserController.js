@@ -12,11 +12,6 @@ router.get("/usuarios", async (req,res) => {
 
 //#Post
 router.post("/usuarios", async (req, res) => {
-    /*Una forma
-    const { _id,nombres, apellidos, telefono, credencial, localidad } = req.body;
-    const user = new userModel({ _id,nombres, apellidos, telefono, credencial, localidad });
-    await user.save();*/
-    
     try{
         const user = await userModel.create(req.body);
         res.status(201).json({ status: 'Usuario agregado', user });
