@@ -32,3 +32,14 @@ jobs:
 
       - name: Ejecutar pruebas
         run: npm test
+
+      - name: Construir imagen Docker
+        run: docker build -t craftica-backend:latest .
+
+      - name: Autenticarse en DockerHub
+        run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
+
+      - name: Subir imagen a DockerHub
+        run: |
+          docker tag $IMAGE_NAME:latest ${{ secrets.DOCKERHUB_USERNAME }}/$IMAGE_NAME:latest
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/$IMAGE_NAME:latest
