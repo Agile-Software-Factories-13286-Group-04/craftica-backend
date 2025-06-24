@@ -1,50 +1,17 @@
-name: Craftica CI
+name: CI - Craftica
 
 on:
   push:
     branches:
-      - main
       - develop
-      - feature/ci-cd
+      - feature/**
 
   pull_request:
     branches:
-      - main
       - develop
-      - feature/ci-cd
-
+      - feature/**
 jobs:
-  build-and-test:
-    name: Construir y Probar Craftica API
-    runs-on: ubuntu-latest
-
-    env:
-      IMAGE_NAME: craftica-backend
-      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
-      DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
-
-    steps:
-      - name: Clonar el repositorio
-        uses: actions/checkout@v3
-
-      - name: Configurar Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: "18"
-
-      - name: Instalar dependencias
-        run: npm install
-
-      - name: Ejecutar pruebas
-        run: npm test
-
-      - name: Construir imagen Docker
-        run: docker build -t $IMAGE_NAME:latest .
-
-      - name: Autenticarse en DockerHub
-        run: echo "$DOCKERHUB_TOKEN" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
-
-      - name: Subir imagen a DockerHub
-        run: |
-          docker tag $IMAGE_NAME:latest $DOCKERHUB_USERNAME/$IMAGE_NAME:latest
-          docker push $DOCKERHUB_USERNAME/$IMAGE_NAME:latest
+  test:
+    uses: ./.github/workflows/template-tests.yml
+    with:
+      node-version: "18"
