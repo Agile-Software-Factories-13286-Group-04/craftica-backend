@@ -50,6 +50,7 @@ jobs:
 
       - name: Subir imagen a DockerHub
         run: |
+          SANITIZED_REF=$(echo "${{ github.ref_name }}" | sed 's/\//-/g')
           docker tag $IMAGE_NAME:latest $DOCKERHUB_USERNAME/$IMAGE_NAME:prod-${REF_NAME}
           docker tag $IMAGE_NAME:latest $DOCKERHUB_USERNAME/$IMAGE_NAME:prod-${SHORT_SHA::7}
           docker tag $IMAGE_NAME:latest $DOCKERHUB_USERNAME/$IMAGE_NAME:latest
