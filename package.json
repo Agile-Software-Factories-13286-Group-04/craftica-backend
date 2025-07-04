@@ -6,6 +6,12 @@
   "type": "module",
   "scripts": {
     "test": "cucumber-js",
+    "test:db": "node --experimental-vm-modules node_modules/mocha/bin/mocha tests/database.test.js",
+    "test:connection": "node --experimental-vm-modules node_modules/mocha/bin/mocha tests/connection.test.js",
+    "test:simple": "node --experimental-vm-modules node_modules/mocha/bin/mocha tests/simple-connection.test.js",
+    "test:all": "npm run test:db && npm run test",
+    "test:full": "node tests/run-tests.js",
+    "check:mongodb": "node tests/check-mongodb.js",
     "start": "node src/index.js",
     "dev": "nodemon src/index.js"
   },
@@ -15,6 +21,8 @@
   "devDependencies": {
     "@cucumber/cucumber": "^11.2.0",
     "chai": "^5.2.0",
+    "esm": "^3.2.25",
+    "mocha": "^10.2.0",
     "nodemon": "^3.1.10"
   },
   "dependencies": {

@@ -1,4 +1,4 @@
-const mongoose  = require("mongoose")
+import mongoose from "mongoose";
 
 const publicacionSchema = new mongoose.Schema(
     {
@@ -18,4 +18,4 @@ const publicacionSchema = new mongoose.Schema(
 
 //Exportamos el modelo
 const PublicationModel = mongoose.model("publicaciones", publicacionSchema)
-module.exports = PublicationModel;
+export default PublicationModel;

@@ -1,9 +1,9 @@
-const {Router} = require('express');
+import {Router} from 'express';
 const router = Router();
 
-const publicationModel = require("../models/PublicationModel");
-const productModel = require("../models/ProductModel");
-const storeModel = require("../models/StoreModel");
+import publicationModel from "../models/PublicationModel.js";
+import productModel from "../models/ProductModel.js";
+import storeModel from "../models/StoreModel.js";
 
 //----------------------CRUD PUBLICACIONES-----------------
 //#Get
@@ -54,10 +54,20 @@ router.post("/publicaciones", async (req, res) => {
             return res.status(404).json({ status: "Tienda no encontrada" });
         }
 
-        //Crear la publicacion y añadirle la fecha
-        req.body.fecha = new Date();
+        // Generar un ID único para la nueva publicación
+        const lastPublication = await publicationModel.findOne().sort({ _id: -1 });
+        const newId = lastPublication ? lastPublication._id + 1 : 1;
         
-        const publication = await publicationModel.create(req.body);
+        //Crear la publicacion y añadirle la fecha e ID
+        const publicationData = {
+            _id: newId,
+            ...req.body,
+            fecha: new Date()
+        };
+        
+        const publication = new publicationModel(publicationData);
+        await publication.save();
+        
         res.status(201).json({ status: "Publicación agregada", publication });
     } catch (err) {
         console.error(err);
@@ -123,4 +133,4 @@ router.delete("/publicaciones/:id", async (req, res) => {
 });
 
 //Exportamos el Controlador
-module.exports = router;
+export default router;

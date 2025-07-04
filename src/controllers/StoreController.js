@@ -1,7 +1,7 @@
-const {Router} = require('express');
+import {Router} from 'express';
 const router = Router();
 
-const storeModel = require("../models/StoreModel")
+import storeModel from "../models/StoreModel.js"
 //-----------------CRUD TIENDAS-----------------
 //#Get
 router.get("/tiendas", async (req, res)=>{
@@ -18,7 +18,19 @@ router.get('/tiendas/:id', async (req, res) => {
 //#Post
 router.post("/tiendas", async (req, res) => {
     try {
-        const store = await storeModel.create(req.body);
+        // Generar un ID único para la nueva tienda
+        const lastStore = await storeModel.findOne().sort({ _id: -1 });
+        const newId = lastStore ? lastStore._id + 1 : 1;
+        
+        // Crear la tienda con el ID generado
+        const storeData = {
+            _id: newId,
+            ...req.body
+        };
+        
+        const store = new storeModel(storeData);
+        await store.save();
+        
         res.status(201).json({ status: "Tienda agregada", store });
     } catch (err) {
         console.error(err);
@@ -48,4 +60,4 @@ router.delete("/tiendas/:id", async (req, res) => {
     }
 });
 
-module.exports = router;
+export default router;

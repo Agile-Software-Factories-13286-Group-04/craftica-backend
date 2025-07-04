@@ -1,9 +1,9 @@
-const {Router} = require('express');
+import {Router} from 'express';
 const router = Router();
 
-const commentModel = require("../models/CommentModel");
-const userModel = require("../models/UserModel");
-const publicationModel = require("../models/PublicationModel");
+import commentModel from "../models/CommentModel.js";
+import userModel from "../models/UserModel.js";
+import publicationModel from "../models/PublicationModel.js";
 
 //-----------------CRUD COMENTARIOS-----------------
 
@@ -29,12 +29,21 @@ router.post("/comentarios", async (req, res) => {
             return res.status(404).json({ status: "Publicacion no encontrada" });
         }
 
+        // Generar un ID único para el nuevo comentario
+        const lastComment = await commentModel.findOne().sort({ _id: -1 });
+        const newId = lastComment ? lastComment._id + 1 : 1;
 
-        //Crear el comentario y añadirle la fecha
-        req.body.fecha = new Date();
-        req.body.megusta = 0; 
+        //Crear el comentario y añadirle la fecha e ID
+        const commentData = {
+            _id: newId,
+            ...req.body,
+            fecha: new Date(),
+            megusta: 0
+        };
 
-        const comment = await commentModel.create(req.body);
+        const comment = new commentModel(commentData);
+        await comment.save();
+        
         res.status(201).json({ status: "Comentario agregado", comment });
     } catch (err) {
         console.error(err);
@@ -127,4 +136,4 @@ router.get("/comentarios/publicacion/:id", async (req, res)=>{
 });
 
 //Exportamos el Controlador
-module.exports = router;
+export default router;

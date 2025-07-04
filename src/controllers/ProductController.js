@@ -1,7 +1,7 @@
-const {Router} = require('express');
+import {Router} from 'express';
 const router = Router();
 
-const productModel = require("../models/ProductModel");
+import productModel from "../models/ProductModel.js";
 
 //-----------------CRUD PRODUCTOS-----------------
 //#Get
@@ -13,7 +13,19 @@ router.get("/productos", async (req, res)=>{
 //#Post
 router.post("/productos", async (req, res) => {
     try {
-        const product = await productModel.create(req.body);
+        // Generar un ID único para el nuevo producto
+        const lastProduct = await productModel.findOne().sort({ _id: -1 });
+        const newId = lastProduct ? lastProduct._id + 1 : 1;
+        
+        // Crear el producto con el ID generado
+        const productData = {
+            _id: newId,
+            ...req.body
+        };
+        
+        const product = new productModel(productData);
+        await product.save();
+        
         res.status(201).json({ status: "Producto agregado", product });
     } catch (err) {
         console.error(err);
@@ -57,4 +69,4 @@ router.delete("/productos/:id", async (req, res) => {
 });
 
 //Exportamos el Controlador
-module.exports = router;
+export default router;

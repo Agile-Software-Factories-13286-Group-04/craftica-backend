@@ -1,7 +1,7 @@
-const {Router} = require('express');
+import {Router} from 'express';
 const router = Router();
 
-const userModel = require("../models/UserModel");
+import userModel from "../models/UserModel.js";
 
 //-----------------CRUD USUARIOS-----------------
 //#Get
@@ -13,7 +13,19 @@ router.get("/usuarios", async (req,res) => {
 //#Post
 router.post("/usuarios", async (req, res) => {
     try{
-        const user = await userModel.create(req.body);
+        // Generar un ID único para el nuevo usuario
+        const lastUser = await userModel.findOne().sort({ _id: -1 });
+        const newId = lastUser ? lastUser._id + 1 : 1;
+        
+        // Crear el usuario con el ID generado
+        const userData = {
+            _id: newId,
+            ...req.body
+        };
+        
+        const user = new userModel(userData);
+        await user.save();
+        
         res.status(201).json({ status: 'Usuario agregado', user });
     }catch(err){
         console.error(err);
@@ -77,4 +89,4 @@ router.post("/usuarios/login", async (req, res) => {
 });
 
 //Exportamos el Controlador
-module.exports = router;
+export default router;

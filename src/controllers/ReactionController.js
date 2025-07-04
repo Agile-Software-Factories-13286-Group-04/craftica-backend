@@ -1,7 +1,7 @@
-const {Router} = require('express');
+import {Router} from 'express';
 const router = Router();
 
-const reactionModel = require("../models/ReactionModel");
+import reactionModel from "../models/ReactionModel.js";
 
 //-----------------CRUD REACCIONES-----------------
 
@@ -15,16 +15,26 @@ router.get("/reacciones", async (req, res)=>{
 router.post("/reacciones", async (req, res) => {
     try {
         //Validar si ya existe una reaccion del usuario en una publicacion
-        const userReaction = await reactionModel.findOne({publicacion_id: req.body.publicacion_id, usuario_id: req.user._id});
+        const userReaction = await reactionModel.findOne({publicacion_id: req.body.publicacion_id, usuario_id: req.body.usuario_id});
 
         if (userReaction) {
             return res.status(500).json({ status: "El usuario ya tiene una reacción", reaction: userReaction });
         }
 
-        //Crear la reaccion y añadirle la fecha
-        req.body.fecha = new Date();
+        // Generar un ID único para la nueva reacción
+        const lastReaction = await reactionModel.findOne().sort({ _id: -1 });
+        const newId = lastReaction ? lastReaction._id + 1 : 1;
 
-        const reaction = await reactionModel.create(req.body);
+        //Crear la reaccion y añadirle la fecha e ID
+        const reactionData = {
+            _id: newId,
+            ...req.body,
+            fecha: new Date()
+        };
+
+        const reaction = new reactionModel(reactionData);
+        await reaction.save();
+        
         res.status(201).json({ status: "Reaccion agregada", reaction });
     } catch (err) {
         console.error(err);
@@ -93,4 +103,4 @@ router.get("/reacciones/publicacion/:id", async (req, res)=>{
 });
 
 //Exportamos el Controlador
-module.exports = router;
+export default router;

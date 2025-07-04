@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const reactionSchema = new mongoose.Schema(
     {
@@ -16,4 +16,4 @@ const reactionSchema = new mongoose.Schema(
 
 // Exportamos el modelo
 const ReactionModel = mongoose.model("reacciones", reactionSchema);
-module.exports = ReactionModel;
+export default ReactionModel;

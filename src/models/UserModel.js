@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const userSchema =  new mongoose.Schema(
     {
@@ -26,4 +26,4 @@ const userSchema =  new mongoose.Schema(
 //Exportamos el modelo
 const UserModel = mongoose.model("usuarios", userSchema);
 
-module.exports = UserModel;
+export default UserModel;
