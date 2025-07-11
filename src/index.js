@@ -1,50 +1,52 @@
 //Importamos Framework express
 import express from "express";
-
-//Importamos el cors para permitir el acceso a la API
 import cors from "cors";
-
-//Generamos la app Web
-const app = express();
-
-//Mostrar un HTML en el navegador
 import path from "path";
-import { fileURLToPath } from 'url';
+import { fileURLToPath } from "url";
 
+const app = express();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const publicPath = path.join(__dirname, './shared/');
+const publicPath = path.join(__dirname, "./shared/");
 
-//Importamos el modulo de ruta de la base de datos
-import database from './database.js';
+import database from "./database.js";
 
+// Middlewares
 app.use(express.json());
-
-// Middleware para servir archivos estáticos
+app.use(cors());
 app.use(express.static(publicPath));
 
-//Activamos el cors para permitir el acceso a la API
-app.use(cors());
+// Ruta principal para probar disponibilidad
+app.get("/", (req, res) => {
+  res.sendFile(path.join(publicPath, "index.html"));
+});
 
-// Función async para manejar las importaciones dinámicas
+// Inicializa el servidor
 async function startServer() {
-    //Importamos el modelos de la base de datos
-    app.use((await import("./routes/index.routes.js")).default);
-    app.use((await import("./models/StoreModel.js")).default);
-    app.use((await import("./models/ProductModel.js")).default);
-    app.use((await import("./models/UserModel.js")).default);
-    app.use((await import("./models/PublicationModel.js")).default);
-    app.use((await import("./models/CommentModel.js")).default);
-    app.use((await import("./models/ReactionModel.js")).default);
+  try {
+    // Conexión a BD (asegúrate que database.js haga la conexión)
+    await database();
 
-    //Definimos el puerto del servicio web
-    app.listen(3000);
-    console.log("Server on port", 3000);
+    // Importación de modelos (solo para que se registren)
+    await import("./models/StoreModel.js");
+    await import("./models/ProductModel.js");
+    await import("./models/UserModel.js");
+    await import("./models/PublicationModel.js");
+    await import("./models/CommentModel.js");
+    await import("./models/ReactionModel.js");
 
-    app.get('/', (req, res) => {
-        res.sendFile(path.join(publicPath, 'index.html'));
+    // Rutas
+    const routes = (await import("./routes/index.routes.js")).default;
+    app.use(routes);
+
+    // Puerto
+    const PORT = process.env.PORT || 3000;
+    app.listen(PORT, "0.0.0.0", () => {
+      console.log(`✅ Servidor corriendo en el puerto ${PORT}`);
     });
+  } catch (error) {
+    console.error("❌ Error al iniciar el servidor:", error);
+  }
 }
 
-// Ejecutamos la función
-startServer().catch(console.error);
+startServer();
